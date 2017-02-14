@@ -1,0 +1,17 @@
+gitlab:
+  image: 'gitlab/gitlab-ce:8.16.4-ce.0'
+  restart: always
+  hostname: "changeme"
+  environment:
+    GITLAB_SIGNUP_ENABLED: 'false'
+    GITLAB_OMNIBUS_CONFIG: |
+      external_url "http://changeme"
+      # other configs
+  ports:
+    - '80:80'
+    - '2222:22'
+  volumes:
+    - '/srv/gitlab/config:/etc/gitlab'
+    - '/srv/gitlab/logs:/var/log/gitlab'
+    - '/srv/gitlab/data:/var/opt/gitlab'
+
