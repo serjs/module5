@@ -1,17 +1,43 @@
-gitlab:
-  image: 'gitlab/gitlab-ce:8.16.4-ce.0'
-  restart: always
-  hostname: "changeme"
-  environment:
-    GITLAB_SIGNUP_ENABLED: 'false'
-    GITLAB_OMNIBUS_CONFIG: |
-      external_url "http://changeme"
-      # other configs
-  ports:
-    - '80:80'
-    - '2222:22'
-  volumes:
-    - '/srv/gitlab/config:/etc/gitlab'
-    - '/srv/gitlab/logs:/var/log/gitlab'
-    - '/srv/gitlab/data:/var/opt/gitlab'
+version: "2.1"
+services:
+  gitlab:
+    image: 'gitlab/gitlab-ce:8.16.4-ce.0'
+    restart: always
+    hostname: ${module5_host}
+    environment:
+      GITLAB_SIGNUP_ENABLED: 'false'
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url "http://${module5_host}"
+        # other configs
+    ports:
+      - '80:80'
+    volumes:
+      - '/srv/docker/gitlab/config:/etc/gitlab'
+      - '/srv/docker/gitlab/logs:/var/log/gitlab'
+      - '/srv/docker/gitlab/data:/var/opt/gitlab'
 
+  gitlab_runner:
+    #image: gitlab/gitlab-runner:v1.10.4
+    build: images/gitlab_runner
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://gitlab", "||", "exit 1"]
+      interval: 1m
+      timeout: 10s
+      retries: 5
+    volumes:
+      - /srv/docker/gitlab-runner:/home/gitlab-runner
+      - /srv/docker/gitlab-runner-etc:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - CI_SERVER_URL=http://gitlab/ci
+      - REGISTRATION_TOKEN=${GITLAB_REGISTRATION_TOKEN}
+      - CI_SERVER_TOKEN=${GITLAB_CI_SERVER_TOKEN}
+      - DOCKER_IMAGE="docker:latest"
+      - RUNNER_NAME=dockermk
+      - RUNNER_EXECUTOR=docker
+      - DOCKER_PRIVILEGED=true
+      - DOCKER_CERT_PATH=/docker
+      - DOCKER_VOLUMES=/var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - gitlab
+    restart: always
