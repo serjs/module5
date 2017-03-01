@@ -1,3 +1,3 @@
 data
-images/docker-git-compose/certs
+images/docker-git-compose/certs/*
 *.tar.gz
