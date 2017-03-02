@@ -19,15 +19,13 @@ docker build -t $DOCKERHUB_USER/docker:git-compose images/docker-git-compose
 docker push $DOCKERHUB_USER/docker:git-compose
 
 # Setup infrastructure
-printf "\n\n\nПоднимаем инфраструктуру\n"
+printf "\n\n\nСоздаем пользователя и обновляем регистрацию\n"
 docker-compose up -d
 
 while [ $(curl --write-out %{http_code} --silent --output /dev/null http://$module5_host/users/sign_in) -ne 200 ]; do
   # Убираем возможно регистрации на время мастер-класса
-  printf "Выполняем настройки CI\n"
   docker-compose exec -T gitlab gitlab-rails runner "ApplicationSetting.last.update_attributes(signup_enabled: false)" > /dev/null
 
-  printf "Создаем пользователя\n"
   # Создаем пользователя
   docker-compose exec -T gitlab gitlab-rails runner "user = User.find_by(email: 'admin@example.com'); user.password = \"$GITLAB_PASSWORD\"; user.password_confirmation = 'dockermk'; user.password_automatically_set = false; user.save" > /dev/null
 done
