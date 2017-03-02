@@ -17,8 +17,7 @@ services:
       - '/srv/docker/gitlab/data:/var/opt/gitlab'
 
   gitlab_runner:
-    #image: gitlab/gitlab-runner:v1.10.4
-    build: images/gitlab_runner
+    image: gitlab/gitlab-runner:v1.10.4
     healthcheck:
       test: ["CMD", "curl", "-f", "http://gitlab", "||", "exit 1"]
       interval: 1m
