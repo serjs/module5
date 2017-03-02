@@ -3,7 +3,7 @@ source mk-helpers/env.vars
 eval $(docker-machine env $machine)
 
 
-BACKUP=1488479292_2017_03_02
+BACKUP=1488480737_2017_03_02
 BACKUP_FILE="$BACKUP"_gitlab_backup.tar
 
 printf "Подгтовка проектов\n"
